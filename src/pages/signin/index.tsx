@@ -4,9 +4,48 @@ import Button from "../../components/button";
 import { ButtonText } from "../../components/buttonText";
 import { Input } from "../../components/input";
 import { FiMail, FiLock } from "react-icons/fi";
+import { useContext, useState } from "react";
+import { err } from "../signup";
+import { AuthContext, Context } from "../../context/authContext";
 
 function SignIn() {
   const navigate = useNavigate();
+
+  const { sign } = useContext(AuthContext) as Context;
+
+  
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errorForm, setErrorForm] = useState<err>({
+    email: "",
+    password: "",
+  });
+  console.log(form)
+  const handleLogin = () => {
+    let formValid = true;
+
+    if (form.email.length === 0) {
+      setErrorForm((prev) => ({ ...prev, email: "E-mail Obrigatório" }));
+      formValid = false;
+    } else {
+      setErrorForm((prev) => ({ ...prev, email: null }));
+    }
+
+    if (form.password.length === 0) {
+      setErrorForm((prev) => ({ ...prev, password: "Senha Obrigatória" }));
+      formValid = false;
+    } else {
+      setErrorForm((prev) => ({ ...prev, password: null }));
+    }
+
+    if (!formValid) return;
+
+    sign({ email: form.email, password: form.password });
+  };
 
   return (
     <section className="flex justify-between">
@@ -20,12 +59,35 @@ function SignIn() {
 
         <form className="flex flex-col items-center justify-center">
           <div className="w-full flex flex-col gap-2 mb-6">
-            <Input icon={FiMail} placeholder="E-mail" />
-            <Input icon={FiLock} placeholder="Senha" />
+            <Input
+              type="text"
+              icon={FiMail}
+              placeholder="E-mail"
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, email: e.target.value }))
+              }
+            />
+
+            {errorForm.email && (
+              <span className="mt-1 text-red-600">{errorForm.email}</span>
+            )}
+
+            <Input
+              type="password"
+              icon={FiLock}
+              placeholder="Senha"
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, password: e.target.value }))
+              }
+            />
+
+            {errorForm.password && (
+              <span className="mt-1 text-red-600">{errorForm.password}</span>
+            )}
           </div>
 
           <div className="w-full mb-6">
-            <Button title="Entrar" />
+            <Button title="Entrar" onClick={handleLogin} />
           </div>
 
           <ButtonText

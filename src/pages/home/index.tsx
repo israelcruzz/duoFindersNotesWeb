@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ButtonText } from "../../components/buttonText";
 import { Header } from "../../components/header";
 import { Input } from "../../components/input";
@@ -6,12 +6,44 @@ import { Note } from "../../components/note";
 import { Section } from "../../components/section";
 import { FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../services/api";
+
+interface INote {
+  title: string;
+  description: string;
+  id: string;
+  tags: any[];
+  links: any[];
+}
+
+interface ITag {
+  name: string;
+}
 
 function Home() {
   const navigate = useNavigate();
-
+  const [notes, setNotes] = useState<INote[]>([]);
+  const [tags, setTags] = useState<ITag[]>([]);
+  const [title, setTitle] = useState("");
   const [tagsSelected, setTagsSelected] = useState<string[]>([]);
-  const arrayTags = ["Nodejs", "Express"];
+
+  useEffect(() => {
+    const handleNotes = async () => {
+      const response = await api.get(`/notes?title=${title}&tags=${tagsSelected}`);
+      setNotes(response.data);
+    };
+
+    handleNotes();
+  }, [tags, title]);
+
+  useEffect(() => {
+    const handleTags = async () => {
+      const response = await api.get("/tags");
+      setTags(response.data);
+    };
+
+    handleTags();
+  });
 
   const handleTagsSelected = (tag: string) => {
     if (tag === "all") {
@@ -27,6 +59,7 @@ function Home() {
   };
 
   console.log(tagsSelected);
+  console.log(notes);
 
   return (
     <main className="w-full h-[100vh] flex">
@@ -44,13 +77,13 @@ function Home() {
               onClick={() => handleTagsSelected("all")}
             />
 
-            {arrayTags.map((tag, index) => {
+            {tags.map((tag, index) => {
               return (
                 <ButtonText
                   key={index}
-                  title={tag}
-                  isActive={tagsSelected.includes(tag)}
-                  onClick={() => handleTagsSelected(tag)}
+                  title={tag.name}
+                  isActive={tagsSelected.includes(tag.name)}
+                  onClick={() => handleTagsSelected(tag.name)}
                 />
               );
             })}
@@ -68,28 +101,26 @@ function Home() {
         <Header />
 
         <div className="p-8 flex flex-col gap-6">
-          <Input placeholder="Pesquisar pelo título" />
+          <Input
+            placeholder="Pesquisar pelo título"
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
           <Section title="Minhas notas">
             <Section.Column>
-              <Note
-                data={{
-                  title: "Proj. Backend",
-                  tags: ["nodejs", "express"],
-                  id: "s",
-                  description: "nota",
-                }}
-                onClick={() => navigate(`/details/3`)}
-              />
-              <Note
-                data={{
-                  title: "Proj. Fullstack",
-                  tags: ["nodejs", "reactjs"],
-                  id: "dada",
-                  description: "nota",
-                }}
-                onClick={() => navigate(`/details/3`)}
-              />
+              {notes &&
+                notes.map((note, index) => {
+                  return (
+                    <Note
+                      key={index}
+                      id={note.id}
+                      description={note.description}
+                      title={note.title}
+                      tags={note.tags}
+                      onClick={() => navigate(`/details/${note.id}`)}
+                    />
+                  );
+                })}
             </Section.Column>
           </Section>
         </div>

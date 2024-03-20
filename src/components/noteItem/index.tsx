@@ -35,6 +35,7 @@ export const NoteItem = ({
 
       <button
         onClick={onClick}
+        type="button"
         className={`${isNew ? "text-[#FF9000]" : "text-[#FF002E]"}`}
       >
         {isNew ? <FiPlus size={24} /> : <FiX size={24} />}

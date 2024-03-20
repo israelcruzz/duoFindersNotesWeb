@@ -1,12 +1,14 @@
-import { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, useContext } from "react";
 import { Loading } from "../loading";
+import { AuthContext, Context } from "../../context/authContext";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   title: string;
-  loading?: boolean;
 }
 
-const Button = ({ title, loading = false, ...rest }: ButtonProps) => {
+const Button = ({ title, ...rest }: ButtonProps) => {
+  const { loading } = useContext(AuthContext) as Context
+
   return (
     <button
       type="button"
