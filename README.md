@@ -14,7 +14,7 @@ Projeto desenvolvido durante o curso Explorer da Rocketseat, ao final do módulo
 ## Tecnologias
 
 - HTML
-- JavaScript (ES6 Modules)
+- Typescript
 - React
 - CSS-in-JS
 - Vite
